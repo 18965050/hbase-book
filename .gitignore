@@ -3,3 +3,8 @@
 target/
 .idea/
 /cluster/ansible/files/
+
+#eclipse
+**/.settings/
+.project
+.classpath
