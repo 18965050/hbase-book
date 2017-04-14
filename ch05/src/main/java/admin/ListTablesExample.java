@@ -15,42 +15,45 @@ import util.HBaseHelper;
 // cc ListTablesExample Example listing the existing tables and their descriptors
 public class ListTablesExample {
 
-  public static void main(String[] args) throws IOException, InterruptedException {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws IOException, InterruptedException {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable1");
-    helper.dropTable("testtable2");
-    helper.dropTable("testtable3");
-    helper.createTable("testtable1", "colfam1", "colfam2", "colfam3");
-    helper.createTable("testtable2", "colfam1", "colfam2", "colfam3");
-    helper.createTable("testtable3", "colfam1", "colfam2", "colfam3");
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    // vv ListTablesExample
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Admin admin = connection.getAdmin();
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    HTableDescriptor[] htds = admin.listTables();
-    // ^^ ListTablesExample
-    System.out.println("Printing all tables...");
-    // vv ListTablesExample
-    for (HTableDescriptor htd : htds) {
-      System.out.println(htd);
-    }
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable1");
+		helper.dropTable("testtable2");
+		helper.dropTable("testtable3");
+		helper.createTable("testtable1", "colfam1", "colfam2", "colfam3");
+		helper.createTable("testtable2", "colfam1", "colfam2", "colfam3");
+		helper.createTable("testtable3", "colfam1", "colfam2", "colfam3");
 
-    HTableDescriptor htd1 = admin.getTableDescriptor(
-      TableName.valueOf("testtable1"));
-    // ^^ ListTablesExample
-    System.out.println("Printing testtable1...");
-    // vv ListTablesExample
-    System.out.println(htd1);
+		// vv ListTablesExample
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Admin admin = connection.getAdmin();
 
-    HTableDescriptor htd2 = admin.getTableDescriptor(
-      TableName.valueOf("testtable10"));
-    // ^^ ListTablesExample
-    System.out.println("Printing testtable10...");
-    // vv ListTablesExample
-    System.out.println(htd2);
-    // ^^ ListTablesExample
-  }
+		HTableDescriptor[] htds = admin.listTables();
+		// ^^ ListTablesExample
+		System.out.println("Printing all tables...");
+		// vv ListTablesExample
+		for (HTableDescriptor htd : htds) {
+			System.out.println(htd);
+		}
+
+		HTableDescriptor htd1 = admin.getTableDescriptor(TableName.valueOf("testtable1"));
+		// ^^ ListTablesExample
+		System.out.println("Printing testtable1...");
+		// vv ListTablesExample
+		System.out.println(htd1);
+
+		HTableDescriptor htd2 = admin.getTableDescriptor(TableName.valueOf("testtable10"));
+		// ^^ ListTablesExample
+		System.out.println("Printing testtable10...");
+		// vv ListTablesExample
+		System.out.println(htd2);
+		// ^^ ListTablesExample
+	}
 }

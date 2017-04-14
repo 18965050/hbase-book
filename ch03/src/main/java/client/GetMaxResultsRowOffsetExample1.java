@@ -19,45 +19,51 @@ import util.HBaseHelper;
 
 public class GetMaxResultsRowOffsetExample1 {
 
-  public static void main(String[] args) throws IOException {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws IOException {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", 3, "colfam1");
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(TableName.valueOf("testtable"));
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    // vv GetMaxResultsRowOffsetExample1
-    Put put = new Put(Bytes.toBytes("row1"));
-    for (int n = 1; n <= 1000; n++) {
-      String num = String.format("%04d", n);
-      put.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual" + num),
-        Bytes.toBytes("val" + num));
-    }
-    table.put(put);
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		helper.createTable("testtable", 3, "colfam1");
 
-    Get get1 = new Get(Bytes.toBytes("row1"));
-    get1.setMaxResultsPerColumnFamily(10); // co GetMaxResultsRowOffsetExample1-1-Get1 Ask for ten cells to be returned at most.
-    Result result1 = table.get(get1);
-    CellScanner scanner1 = result1.cellScanner();
-    while (scanner1.advance()) {
-      System.out.println("Get 1 Cell: " + scanner1.current());
-    }
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Table table = connection.getTable(TableName.valueOf("testtable"));
 
-    Get get2 = new Get(Bytes.toBytes("row1"));
-    get2.setMaxResultsPerColumnFamily(10);
-    get2.setRowOffsetPerColumnFamily(100); // co GetMaxResultsRowOffsetExample1-2-Get2 In addition, also skip the first 100 cells.
-    Result result2 = table.get(get2);
-    CellScanner scanner2 = result2.cellScanner();
-    while (scanner2.advance()) {
-      System.out.println("Get 2 Cell: " + scanner2.current());
-    }
+		// vv GetMaxResultsRowOffsetExample1
+		Put put = new Put(Bytes.toBytes("row1"));
+		for (int n = 1; n <= 1000; n++) {
+			String num = String.format("%04d", n);
+			put.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual" + num), Bytes.toBytes("val" + num));
+		}
+		table.put(put);
 
-    // ^^ GetMaxResultsRowOffsetExample1
-    table.close();
-    connection.close();
-    helper.close();
-  }
+		Get get1 = new Get(Bytes.toBytes("row1"));
+		get1.setMaxResultsPerColumnFamily(10); // co GetMaxResultsRowOffsetExample1-1-Get1 Ask for ten cells to be
+												// returned at most.
+		Result result1 = table.get(get1);
+		CellScanner scanner1 = result1.cellScanner();
+		while (scanner1.advance()) {
+			System.out.println("Get 1 Cell: " + scanner1.current());
+		}
+
+		Get get2 = new Get(Bytes.toBytes("row1"));
+		get2.setMaxResultsPerColumnFamily(10);
+		get2.setRowOffsetPerColumnFamily(100); // co GetMaxResultsRowOffsetExample1-2-Get2 In addition, also skip the
+												// first 100 cells.
+		Result result2 = table.get(get2);
+		CellScanner scanner2 = result2.cellScanner();
+		while (scanner2.advance()) {
+			System.out.println("Get 2 Cell: " + scanner2.current());
+		}
+
+		// ^^ GetMaxResultsRowOffsetExample1
+		table.close();
+		connection.close();
+		helper.close();
+	}
 }

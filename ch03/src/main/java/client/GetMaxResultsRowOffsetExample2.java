@@ -17,58 +17,65 @@ import util.HBaseHelper;
 
 public class GetMaxResultsRowOffsetExample2 {
 
-  public static void main(String[] args) throws Exception {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws Exception {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", 3, "colfam1");
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(TableName.valueOf("testtable"));
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    // vv GetMaxResultsRowOffsetExample2
-    for (int version = 1; version <= 3; version++) { // co GetMaxResultsRowOffsetExample2-1-Loop Insert three versions of each column.
-      Put put = new Put(Bytes.toBytes("row1"));
-      for (int n = 1; n <= 1000; n++) {
-        String num = String.format("%04d", n);
-        put.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual" + num),
-          Bytes.toBytes("val" + num));
-      }
-      System.out.println("Writing version: " + version);
-      table.put(put);
-      Thread.currentThread().sleep(1000);
-    }
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		helper.createTable("testtable", 3, "colfam1");
 
-    Get get0 = new Get(Bytes.toBytes("row1"));
-    get0.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual0001"));
-    get0.setMaxVersions(); // co GetMaxResultsRowOffsetExample2-2-Get0 Get a column with all versions as a test.
-    Result result0 = table.get(get0);
-    CellScanner scanner0 = result0.cellScanner();
-    while (scanner0.advance()) {
-      System.out.println("Get 0 Cell: " + scanner0.current());
-    }
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Table table = connection.getTable(TableName.valueOf("testtable"));
 
-    Get get1 = new Get(Bytes.toBytes("row1"));
-    get1.setMaxResultsPerColumnFamily(10); // co GetMaxResultsRowOffsetExample2-3-Get1 Get ten cells, single version per column.
-    Result result1 = table.get(get1);
-    CellScanner scanner1 = result1.cellScanner();
-    while (scanner1.advance()) {
-      System.out.println("Get 1 Cell: " + scanner1.current());
-    }
+		// vv GetMaxResultsRowOffsetExample2
+		for (int version = 1; version <= 3; version++) { // co GetMaxResultsRowOffsetExample2-1-Loop Insert three
+															// versions of each column.
+			Put put = new Put(Bytes.toBytes("row1"));
+			for (int n = 1; n <= 1000; n++) {
+				String num = String.format("%04d", n);
+				put.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual" + num), Bytes.toBytes("val" + num));
+			}
+			System.out.println("Writing version: " + version);
+			table.put(put);
+			Thread.currentThread().sleep(1000);
+		}
 
-    Get get2 = new Get(Bytes.toBytes("row1"));
-    get2.setMaxResultsPerColumnFamily(10);
-    get2.setMaxVersions(3); // co GetMaxResultsRowOffsetExample2-4-Get2 Do the same but now retrieve all versions of a column.
-    Result result2 = table.get(get2);
-    CellScanner scanner2 = result2.cellScanner();
-    while (scanner2.advance()) {
-      System.out.println("Get 2 Cell: " + scanner2.current());
-    }
+		Get get0 = new Get(Bytes.toBytes("row1"));
+		get0.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual0001"));
+		get0.setMaxVersions(); // co GetMaxResultsRowOffsetExample2-2-Get0 Get a column with all versions as a test.
+		Result result0 = table.get(get0);
+		CellScanner scanner0 = result0.cellScanner();
+		while (scanner0.advance()) {
+			System.out.println("Get 0 Cell: " + scanner0.current());
+		}
 
-    // ^^ GetMaxResultsRowOffsetExample2
-    table.close();
-    connection.close();
-    helper.close();
-  }
+		Get get1 = new Get(Bytes.toBytes("row1"));
+		get1.setMaxResultsPerColumnFamily(10); // co GetMaxResultsRowOffsetExample2-3-Get1 Get ten cells, single version
+												// per column.
+		Result result1 = table.get(get1);
+		CellScanner scanner1 = result1.cellScanner();
+		while (scanner1.advance()) {
+			System.out.println("Get 1 Cell: " + scanner1.current());
+		}
+
+		Get get2 = new Get(Bytes.toBytes("row1"));
+		get2.setMaxResultsPerColumnFamily(10);
+		get2.setMaxVersions(3); // co GetMaxResultsRowOffsetExample2-4-Get2 Do the same but now retrieve all versions of
+								// a column.
+		Result result2 = table.get(get2);
+		CellScanner scanner2 = result2.cellScanner();
+		while (scanner2.advance()) {
+			System.out.println("Get 2 Cell: " + scanner2.current());
+		}
+
+		// ^^ GetMaxResultsRowOffsetExample2
+		table.close();
+		connection.close();
+		helper.close();
+	}
 }

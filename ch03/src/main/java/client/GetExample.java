@@ -17,33 +17,42 @@ import util.HBaseHelper;
 
 public class GetExample {
 
-  public static void main(String[] args) throws IOException {
-    // vv GetExample
-    Configuration conf = HBaseConfiguration.create(); // co GetExample-1-CreateConf Create the configuration.
+	public static void main(String[] args) throws IOException {
 
-    // ^^ GetExample
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    if (!helper.existsTable("testtable")) {
-      helper.createTable("testtable", "colfam1");
-    }
-    // vv GetExample
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(TableName.valueOf("testtable")); // co GetExample-2-NewTable Instantiate a new table reference.
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		// vv GetExample
+		Configuration conf = HBaseConfiguration.create(); // co GetExample-1-CreateConf Create the configuration.
 
-    Get get = new Get(Bytes.toBytes("row1")); // co GetExample-3-NewGet Create get with specific row.
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
+		// ^^ GetExample
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		if (!helper.existsTable("testtable")) {
+			helper.createTable("testtable", "colfam1");
+		}
+		// vv GetExample
+		Connection connection = ConnectionFactory.createConnection(conf);
 
-    get.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1")); // co GetExample-4-AddCol Add a column to the get.
+		Table table = connection.getTable(TableName.valueOf("testtable")); // co GetExample-2-NewTable Instantiate a new
+																			// table reference.
 
-    Result result = table.get(get); // co GetExample-5-DoGet Retrieve row with selected columns from HBase.
+		Get get = new Get(Bytes.toBytes("row1")); // co GetExample-3-NewGet Create get with specific row.
 
-    byte[] val = result.getValue(Bytes.toBytes("colfam1"),
-      Bytes.toBytes("qual1")); // co GetExample-6-GetValue Get a specific value for the given column.
+		get.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1")); // co GetExample-4-AddCol Add a column to the
+																			// get.
 
-    System.out.println("Value: " + Bytes.toString(val)); // co GetExample-7-Print Print out the value while converting it back.
+		Result result = table.get(get); // co GetExample-5-DoGet Retrieve row with selected columns from HBase.
 
-    table.close(); // co GetExample-8-Close Close the table and connection instances to free resources.
-    connection.close();
-    // ^^ GetExample
-    helper.close();
-  }
+		byte[] val = result.getValue(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1")); // co GetExample-6-GetValue Get
+																						// a specific value for the
+																						// given column.
+
+		System.out.println("Value: " + Bytes.toString(val)); // co GetExample-7-Print Print out the value while
+																// converting it back.
+
+		table.close(); // co GetExample-8-Close Close the table and connection instances to free resources.
+		connection.close();
+		// ^^ GetExample
+		helper.close();
+	}
 }

@@ -19,46 +19,51 @@ import util.HBaseHelper;
 
 public class PutWriteBufferExample1 {
 
-  public static void main(String[] args) throws IOException {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws IOException {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", "colfam1");
-    // vv PutWriteBufferExample1
-    TableName name = TableName.valueOf("testtable");
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(name);
-    BufferedMutator mutator = connection.getBufferedMutator(name); // co PutWriteBufferExample1-1-CheckFlush Get a mutator instance for the table.
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    Put put1 = new Put(Bytes.toBytes("row1"));
-    put1.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"),
-      Bytes.toBytes("val1"));
-    mutator.mutate(put1); // co PutWriteBufferExample1-2-DoPut Store some rows with columns into HBase.
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    Put put2 = new Put(Bytes.toBytes("row2"));
-    put2.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"),
-      Bytes.toBytes("val2"));
-    mutator.mutate(put2);
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		helper.createTable("testtable", "colfam1");
+		// vv PutWriteBufferExample1
+		TableName name = TableName.valueOf("testtable");
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Table table = connection.getTable(name);
+		BufferedMutator mutator = connection.getBufferedMutator(name); // co PutWriteBufferExample1-1-CheckFlush Get a
+																		// mutator instance for the table.
 
-    Put put3 = new Put(Bytes.toBytes("row3"));
-    put3.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"),
-      Bytes.toBytes("val3"));
-    mutator.mutate(put3);
+		Put put1 = new Put(Bytes.toBytes("row1"));
+		put1.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"), Bytes.toBytes("val1"));
+		mutator.mutate(put1); // co PutWriteBufferExample1-2-DoPut Store some rows with columns into HBase.
 
-    Get get = new Get(Bytes.toBytes("row1"));
-    Result res1 = table.get(get);
-    System.out.println("Result: " + res1); // co PutWriteBufferExample1-3-Get1 Try to load previously stored row, this will print "Result: keyvalues=NONE".
+		Put put2 = new Put(Bytes.toBytes("row2"));
+		put2.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"), Bytes.toBytes("val2"));
+		mutator.mutate(put2);
 
-    mutator.flush(); // co PutWriteBufferExample1-4-Flush Force a flush, this causes an RPC to occur.
+		Put put3 = new Put(Bytes.toBytes("row3"));
+		put3.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"), Bytes.toBytes("val3"));
+		mutator.mutate(put3);
 
-    Result res2 = table.get(get);
-    System.out.println("Result: " + res2); // co PutWriteBufferExample1-5-Get2 Now the row is persisted and can be loaded.
+		Get get = new Get(Bytes.toBytes("row1"));
+		Result res1 = table.get(get);
+		System.out.println("Result: " + res1); // co PutWriteBufferExample1-3-Get1 Try to load previously stored row,
+												// this will print "Result: keyvalues=NONE".
 
-    mutator.close();
-    table.close();
-    connection.close();
-    // ^^ PutWriteBufferExample1
-    helper.close();
-  }
+		mutator.flush(); // co PutWriteBufferExample1-4-Flush Force a flush, this causes an RPC to occur.
+
+		Result res2 = table.get(get);
+		System.out.println("Result: " + res2); // co PutWriteBufferExample1-5-Get2 Now the row is persisted and can be
+												// loaded.
+
+		mutator.close();
+		table.close();
+		connection.close();
+		// ^^ PutWriteBufferExample1
+		helper.close();
+	}
 }

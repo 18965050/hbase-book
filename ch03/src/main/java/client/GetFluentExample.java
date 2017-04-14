@@ -17,36 +17,36 @@ import util.HBaseHelper;
 
 public class GetFluentExample {
 
-  public static void main(String[] args) throws IOException {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws IOException {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", 5, "colfam1", "colfam2");
-    helper.put("testtable",
-      new String[] { "row1" },
-      new String[] { "colfam1", "colfam2" },
-      new String[] { "qual1", "qual1", "qual2", "qual2" },
-      new long[]   { 1, 2, 3, 4 },
-      new String[] { "val1", "val1", "val2", "val2" });
-    System.out.println("Before get call...");
-    helper.dump("testtable", new String[]{ "row1" }, null, null);
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(TableName.valueOf("testtable"));
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    // vv GetFluentExample
-    Get get = new Get(Bytes.toBytes("row1")) // co GetFluentExample-1-Create Create a new get using the fluent interface.
-      .setId("GetFluentExample")
-      .setMaxVersions()
-      .setTimeStamp(1)
-      .addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1"))
-      .addFamily(Bytes.toBytes("colfam2"));
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    Result result = table.get(get);
-    System.out.println("Result: " + result);
-    // ^^ GetFluentExample
-    table.close();
-    connection.close();
-    helper.close();
-  }
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		helper.createTable("testtable", 5, "colfam1", "colfam2");
+		helper.put("testtable", new String[] { "row1" }, new String[] { "colfam1", "colfam2" },
+				new String[] { "qual1", "qual1", "qual2", "qual2" }, new long[] { 1, 2, 3, 4 },
+				new String[] { "val1", "val1", "val2", "val2" });
+		System.out.println("Before get call...");
+		helper.dump("testtable", new String[] { "row1" }, null, null);
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Table table = connection.getTable(TableName.valueOf("testtable"));
+
+		// vv GetFluentExample
+		Get get = new Get(Bytes.toBytes("row1")) // co GetFluentExample-1-Create Create a new get using the fluent
+													// interface.
+				.setId("GetFluentExample").setMaxVersions().setTimeStamp(1)
+				.addColumn(Bytes.toBytes("colfam1"), Bytes.toBytes("qual1")).addFamily(Bytes.toBytes("colfam2"));
+
+		Result result = table.get(get);
+		System.out.println("Result: " + result);
+		// ^^ GetFluentExample
+		table.close();
+		connection.close();
+		helper.close();
+	}
 }

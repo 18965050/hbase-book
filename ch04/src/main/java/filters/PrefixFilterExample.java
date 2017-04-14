@@ -22,46 +22,49 @@ import util.HBaseHelper;
 
 public class PrefixFilterExample {
 
-  public static void main(String[] args) throws IOException {
-    Configuration conf = HBaseConfiguration.create();
+	public static void main(String[] args) throws IOException {
 
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    helper.createTable("testtable", "colfam1", "colfam2");
-    System.out.println("Adding rows to table...");
-    helper.fillTable("testtable", 1, 10, 10, "colfam1", "colfam2");
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    Connection connection = ConnectionFactory.createConnection(conf);
-    Table table = connection.getTable(TableName.valueOf("testtable"));
-    // vv PrefixFilterExample
-    Filter filter = new PrefixFilter(Bytes.toBytes("row-1"));
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    Scan scan = new Scan();
-    scan.setFilter(filter);
-    ResultScanner scanner = table.getScanner(scan);
-    // ^^ PrefixFilterExample
-    System.out.println("Results of scan:");
-    // vv PrefixFilterExample
-    for (Result result : scanner) {
-      for (Cell cell : result.rawCells()) {
-        System.out.println("Cell: " + cell + ", Value: " +
-          Bytes.toString(cell.getValueArray(), cell.getValueOffset(),
-            cell.getValueLength()));
-      }
-    }
-    scanner.close();
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		helper.createTable("testtable", "colfam1", "colfam2");
+		System.out.println("Adding rows to table...");
+		helper.fillTable("testtable", 1, 10, 10, "colfam1", "colfam2");
 
-    Get get = new Get(Bytes.toBytes("row-5"));
-    get.setFilter(filter);
-    Result result = table.get(get);
-    // ^^ PrefixFilterExample
-    System.out.println("Result of get: ");
-    // vv PrefixFilterExample
-    for (Cell cell : result.rawCells()) {
-      System.out.println("Cell: " + cell + ", Value: " +
-        Bytes.toString(cell.getValueArray(), cell.getValueOffset(),
-          cell.getValueLength()));
-    }
-    // ^^ PrefixFilterExample
-  }
+		Connection connection = ConnectionFactory.createConnection(conf);
+		Table table = connection.getTable(TableName.valueOf("testtable"));
+		// vv PrefixFilterExample
+		Filter filter = new PrefixFilter(Bytes.toBytes("row-1"));
+
+		Scan scan = new Scan();
+		scan.setFilter(filter);
+		ResultScanner scanner = table.getScanner(scan);
+		// ^^ PrefixFilterExample
+		System.out.println("Results of scan:");
+		// vv PrefixFilterExample
+		for (Result result : scanner) {
+			for (Cell cell : result.rawCells()) {
+				System.out.println("Cell: " + cell + ", Value: "
+						+ Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
+			}
+		}
+		scanner.close();
+
+		Get get = new Get(Bytes.toBytes("row-5"));
+		get.setFilter(filter);
+		Result result = table.get(get);
+		// ^^ PrefixFilterExample
+		System.out.println("Result of get: ");
+		// vv PrefixFilterExample
+		for (Cell cell : result.rawCells()) {
+			System.out.println("Cell: " + cell + ", Value: "
+					+ Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
+		}
+		// ^^ PrefixFilterExample
+	}
 }

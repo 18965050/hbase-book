@@ -18,27 +18,35 @@ import util.HBaseHelper;
 // vv LoadWithTableDescriptorExample
 public class LoadWithTableDescriptorExample {
 
-  public static void main(String[] args) throws IOException {
-    Configuration conf = HBaseConfiguration.create();
-    Connection connection = ConnectionFactory.createConnection(conf);
-    // ^^ LoadWithTableDescriptorExample
-    HBaseHelper helper = HBaseHelper.getHelper(conf);
-    helper.dropTable("testtable");
-    // vv LoadWithTableDescriptorExample
-    TableName tableName = TableName.valueOf("testtable");
+	public static void main(String[] args) throws IOException {
+		System.setProperty("hadoop.home.dir", "D:/installed/hadoop-2.5.2");
+		Configuration conf = HBaseConfiguration.create();
 
-    HTableDescriptor htd = new HTableDescriptor(tableName); // co LoadWithTableDescriptorExample-1-Define Define a table descriptor.
-    htd.addFamily(new HColumnDescriptor("colfam1"));
-    htd.setValue("COPROCESSOR$1", "|" + // co LoadWithTableDescriptorExample-2-AddCP Add the coprocessor definition to the descriptor, while omitting the path to the JAR file.
-      RegionObserverExample.class.getCanonicalName() +
-      "|" + Coprocessor.PRIORITY_USER);
+		conf.set("hbase.zookeeper.quorum", "centOS1");
+		conf.set("hbase.zookeeper.property.clientPort", "2181");
 
-    Admin admin = connection.getAdmin(); // co LoadWithTableDescriptorExample-3-Admin Acquire an administrative API to the cluster and add the table.
-    admin.createTable(htd);
+		Connection connection = ConnectionFactory.createConnection(conf);
+		// ^^ LoadWithTableDescriptorExample
+		HBaseHelper helper = HBaseHelper.getHelper(conf);
+		helper.dropTable("testtable");
+		// vv LoadWithTableDescriptorExample
+		TableName tableName = TableName.valueOf("testtable");
 
-    System.out.println(admin.getTableDescriptor(tableName)); // co LoadWithTableDescriptorExample-4-Check Verify if the definition has been applied as expected.
-    admin.close();
-    connection.close();
-  }
+		HTableDescriptor htd = new HTableDescriptor(tableName); // co LoadWithTableDescriptorExample-1-Define Define a
+																// table descriptor.
+		htd.addFamily(new HColumnDescriptor("colfam1"));
+		htd.setValue("COPROCESSOR$1", "|" + // co LoadWithTableDescriptorExample-2-AddCP Add the coprocessor definition
+											// to the descriptor, while omitting the path to the JAR file.
+				RegionObserverExample.class.getCanonicalName() + "|" + Coprocessor.PRIORITY_USER);
+
+		Admin admin = connection.getAdmin(); // co LoadWithTableDescriptorExample-3-Admin Acquire an administrative API
+												// to the cluster and add the table.
+		admin.createTable(htd);
+
+		System.out.println(admin.getTableDescriptor(tableName)); // co LoadWithTableDescriptorExample-4-Check Verify if
+																	// the definition has been applied as expected.
+		admin.close();
+		connection.close();
+	}
 }
 // ^^ LoadWithTableDescriptorExample
